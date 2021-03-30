@@ -2,7 +2,7 @@ USE GrandVirusEpicenter;
 
 /* HOSPITAL */
 
-INSERT INTO HOSPITAL(hospital_name, location) 
+-- INSERT INTO HOSPITAL(hospital_name, location) 
 SELECT DISTINCT(nombre_hospital), direccion_hospital FROM TEMPORAL
 WHERE nombre_hospital IS NOT NULL;
 
@@ -32,11 +32,19 @@ FROM TEMPORAL
 INNER JOIN STATE ON TEMPORAL.estado_victima = STATE.state_name;
  
 /* UBICACION DE LA VICTIMA */
-INSERT INTO VICTIM_LOCATION(location, entrance_datetime, exit_datetime, victim_id) 
-
-
-
+INSERT INTO VICTIM_LOCATION(location, entrance_datetime, exit_datetime, victim_id)
+SELECT ubicacion_victima, fecha_llegada, fecha_retiro, VICTIM.victim_id 
+FROM TEMPORAL
+INNER JOIN VICTIM ON TEMPORAL.nombre_victima = VICTIM.nombre_victima;
 
 /* VICTIMA ESTUDIADA */
 
--- INSERT INTO VICTIM_STUDIED
+INSERT INTO VICTIM_STUDIED(hospital_id, victim_id)
+SELECT HOSPITAL.hospital_id, VICTIM.victim_id
+FROM TEMPORAL
+INNER JOIN HOSPITAL ON TEMPORAL.nombre_hospital = HOSPITAL.hospital_name
+INNER JOIN VICTIM ON  TEMPORAL.nombre_victima = VICTIM.victim_name;
+
+
+
+

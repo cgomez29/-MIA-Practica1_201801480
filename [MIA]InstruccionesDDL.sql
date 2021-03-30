@@ -1,9 +1,11 @@
 CREATE DATABASE GrandVirusEpicenter;
 
+-- DROP DATABASE GrandVirusEpicenter;
+
 USE GrandVirusEpicenter;
 
 CREATE TABLE TEMPORAL (
-	temporal_id INT NOT NULL AUTO_INCREMENT,
+	-- temporal_id INT NOT NULL AUTO_INCREMENT,
 	nombre_victima VARCHAR(60) NOT NULL,					-- X
     apellido_victima VARCHAR(60) NOT NULL,					-- X
     direccion_victima VARCHAR(150) NOT NULL,				-- X
@@ -19,9 +21,9 @@ CREATE TABLE TEMPORAL (
     fecha_fin_contacto VARCHAR(25) DEFAULT NULL,
     nombre_hospital VARCHAR(60) DEFAULT NULL,           	-- X
 	direccion_hospital VARCHAR(120) DEFAULT NULL,       	-- X
-    ubicacion_victima VARCHAR(120) DEFAULT NULL,
+    ubicacion_victima VARCHAR(120) DEFAULT NULL,			-- X
     fecha_llegada VARCHAR(25) DEFAULT NULL,					-- X   registration_date
-    fecha_retiro VARCHAR(25) DEFAULT NULL,
+    fecha_retiro VARCHAR(25) DEFAULT NULL,					-- X
     tratamiento VARCHAR(60) DEFAULT NULL,					-- X
     efectividad VARCHAR(5) DEFAULT NULL,					-- X
     fecha_inicio_tratamiento VARCHAR(25) DEFAULT NULL,
