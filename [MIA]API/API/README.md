@@ -9,3 +9,5 @@ INICIAR
 crear el index.js
 
 npm run dev
+
+# Cristian Gomez

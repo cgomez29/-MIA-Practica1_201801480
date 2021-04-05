@@ -10,6 +10,7 @@ class IndexRoute{
 
     config():void{
         this.router.get('/',indexController.index)
+        this.router.get('/consulta1',indexController.consulta1)
     }
 
 }

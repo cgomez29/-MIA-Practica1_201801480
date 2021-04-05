@@ -1,11 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = require("express");
-var ConsultaRoute = /** @class */ (function () {
-    function ConsultaRoute() {
+const express_1 = require("express");
+class ConsultaRoute {
+    constructor() {
         this.router = express_1.Router();
+        this.config();
     }
-    return ConsultaRoute;
-}());
-var consultaRoute = new ConsultaRoute();
+    config() {
+        //this.router.get('', );
+    }
+}
+const consultaRoute = new ConsultaRoute();
 exports.default = consultaRoute.router;

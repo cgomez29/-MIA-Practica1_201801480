@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = require("express");
-var index_controller_1 = require("../controller/index.controller");
-var IndexRoute = /** @class */ (function () {
-    function IndexRoute() {
+const express_1 = require("express");
+const index_controller_1 = require("../controller/index.controller");
+class IndexRoute {
+    constructor() {
         this.router = express_1.Router();
         this.config();
     }
-    IndexRoute.prototype.config = function () {
+    config() {
         this.router.get('/', index_controller_1.indexController.index);
-    };
-    return IndexRoute;
-}());
-var indexRoute = new IndexRoute();
+        this.router.get('/consulta1', index_controller_1.indexController.consulta1);
+    }
+}
+const indexRoute = new IndexRoute();
 exports.default = indexRoute.router;

@@ -5,7 +5,6 @@ CREATE DATABASE GrandVirusEpicenter;
 USE GrandVirusEpicenter;
 
 CREATE TABLE TEMPORAL (
-	-- temporal_id INT NOT NULL AUTO_INCREMENT,
 	nombre_victima VARCHAR(60) NOT NULL,					-- X
     apellido_victima VARCHAR(60) NOT NULL,					-- X
     direccion_victima VARCHAR(150) NOT NULL,				-- X
@@ -28,8 +27,7 @@ CREATE TABLE TEMPORAL (
     efectividad VARCHAR(5) DEFAULT NULL,					-- X
     fecha_inicio_tratamiento VARCHAR(25) DEFAULT NULL,
     fecha_fin_tratamiento VARCHAR(25) DEFAULT NULL,
-    efectividad_en_victima VARCHAR(5) DEFAULT NULL,
-    PRIMARY KEY (temporal_id)
+    efectividad_en_victima VARCHAR(5) DEFAULT NULL
 );
 
 CREATE TABLE HOSPITAL (
@@ -56,8 +54,13 @@ CREATE TABLE ASSOCIATED (
 	associated_id INT NOT NULL AUTO_INCREMENT,
     associated_name VARCHAR(255) NOT NULL,
     surname VARCHAR(255) NOT NULL,
+    -- datetime_associated DATETIME NOT NULL,
     PRIMARY KEY (associated_id)
 );
+
+
+-- ALTER TABLE ASSOCIATED DROP COLUMN datetime_associated;
+
 
 CREATE TABLE TYPE_CONTACT (
 	type_id INT NOT NULL AUTO_INCREMENT,
@@ -70,22 +73,27 @@ CREATE TABLE VICTIM (
 	victim_name VARCHAR(255) NOT NULL,
     surname VARCHAR(255) NOT NULL,
     location VARCHAR(255) NOT NULL,
-    registration_date DATETIME NOT NULL,
-    death_date DATETIME NOT NULL,
+    confirmacion_date DATETIME NOT NULL,
+    sospecha_date DATETIME NOT NULL NULL,
+    death_date DATETIME DEFAULT NULL,
     state_id INT NOT NULL,
     PRIMARY KEY (victim_id),
     FOREIGN KEY (state_id) REFERENCES STATE(state_id)
 );
 
+-- ALTER TABLE VICTIM_LOCATION MODIFY location VARCHAR(255) NOT NULL;
+
 CREATE TABLE VICTIM_LOCATION (
 	victim_location_id INT NOT NULL AUTO_INCREMENT,
-    location INT NOT NULL,
+    location VARCHAR(255) NOT NULL,
     entrance_datetime DATETIME NOT NULL,
     exit_datetime DATETIME NOT NULL,
     victim_id INT NOT NULL,
     PRIMARY KEY (victim_location_id),
     FOREIGN KEY (victim_id) REFERENCES VICTIM(victim_id)
 );
+
+DESCRIBE VICTIM_LOCATION;
 
 CREATE TABLE VICTIM_STUDIED (
 	studied_id INT NOT NULL AUTO_INCREMENT,
@@ -99,6 +107,8 @@ CREATE TABLE VICTIM_STUDIED (
 CREATE TABLE VICTIM_TREATMENT (
 	treatvictim_id INT NOT NULL AUTO_INCREMENT,
     effect INT NOT NULL,
+    start_date DATETIME NOT NULL,
+    fin_date DATETIME NOT NULL,
     treatment_id INT NOT NULL,
     victim_id INT NOT NULL,
     PRIMARY KEY (treatvictim_id),
@@ -109,20 +119,27 @@ CREATE TABLE VICTIM_TREATMENT (
 CREATE TABLE ASSOCIATED_VICTIM (
 	assvictim_id INT NOT NULL AUTO_INCREMENT,
     datetime_associated DATETIME NOT NULL,
+    victim_id INT NOT NULL,
+    associated_id INT NOT NULL, 
+    PRIMARY KEY (assvictim_id),
+    FOREIGN KEY (victim_id) REFERENCES VICTIM(victim_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (associated_id) REFERENCES ASSOCIATED(associated_id) ON DELETE CASCADE ON UPDATE CASCADE
+); 
+
+
+CREATE TABLE ASSOCIATED_DETAIL (
+	associated_detail_id INT NOT NULL AUTO_INCREMENT,
     datetime_start_contact DATETIME NOT NULL,
     datetime_fin_contact DATETIME NOT NULL,
-    associated_id INT NOT NULL, 
-    victim_id INT NOT NULL,
+    assvictim_id INT NOT NULL,
     type_id INT NOT NULL,
-    PRIMARY KEY (assvictim_id),
-    FOREIGN KEY (associated_id) REFERENCES ASSOCIATED(associated_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (victim_id) REFERENCES VICTIM(victim_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (associated_detail_id),
+    FOREIGN KEY (assvictim_id) REFERENCES ASSOCIATED_VICTIM(assvictim_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (type_id) REFERENCES TYPE_CONTACT(type_id) ON DELETE CASCADE ON UPDATE CASCADE
 ); 
 
 
-
-
+-- ALTER TABLE ASSOCIATED_VICTIM ADD datetime_associated DATETIME NOT NULL ;
 
 
 
