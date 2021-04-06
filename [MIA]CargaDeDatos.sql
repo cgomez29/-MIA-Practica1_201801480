@@ -24,8 +24,10 @@ fecha_inicio_tratamiento, fecha_fin_tratamiento, efectividad_en_victima);
 /* HOSPITAL */
 
 INSERT INTO HOSPITAL(hospital_name, location) 
-SELECT DISTINCT(nombre_hospital), direccion_hospital FROM TEMPORAL
-WHERE nombre_hospital != '';
+SELECT nombre_hospital, direccion_hospital FROM TEMPORAL
+WHERE nombre_hospital != ''
+GROUP BY nombre_hospital, direccion_hospital;
+
 
 /* ESTADO DE UNA VICTIMA */
 
@@ -65,16 +67,16 @@ STATE.state_id;
 INSERT INTO VICTIM_LOCATION(location, entrance_datetime, exit_datetime, victim_id)
 SELECT ubicacion_victima, fecha_llegada, fecha_retiro, VICTIM.victim_id  
 FROM TEMPORAL
-INNER JOIN VICTIM ON TEMPORAL.nombre_victima = VICTIM.victim_name
+INNER JOIN VICTIM ON (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname AND TEMPORAL.direccion_victima = VICTIM.location)
 WHERE ubicacion_victima != ''
-GROUP BY ubicacion_victima, fecha_llegada, fecha_retiro, VICTIM.victim_id;
+GROUP BY VICTIM.victim_name, VICTIM.surname, ubicacion_victima, fecha_llegada, fecha_retiro, VICTIM.victim_id;
 
-/* VICTIMA ESTUDIADA */  -- ----------------------------------****************************************************************************
+/* VICTIMA ESTUDIADA */ 
 INSERT INTO VICTIM_STUDIED(hospital_id, victim_id)
 SELECT HOSPITAL.hospital_id, VICTIM.victim_id
 FROM TEMPORAL
 INNER JOIN HOSPITAL ON (TEMPORAL.nombre_hospital = HOSPITAL.hospital_name AND TEMPORAL.direccion_hospital = HOSPITAL.location)
-INNER JOIN VICTIM ON  (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname)
+INNER JOIN VICTIM ON  (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname AND TEMPORAL.direccion_victima = VICTIM.location)
 GROUP BY HOSPITAL.hospital_id, VICTIM.victim_id;
 
 /* VICTIMA EN TRATAMIENTO */
@@ -84,7 +86,7 @@ SELECT efectividad_en_victima, fecha_inicio_tratamiento,
 fecha_fin_tratamiento, TREATMENT.treatment_id, VICTIM.victim_id
 FROM TEMPORAL
 INNER JOIN TREATMENT ON TEMPORAL.tratamiento = TREATMENT.tname
-INNER JOIN VICTIM ON (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname)
+INNER JOIN VICTIM ON (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname AND TEMPORAL.direccion_victima = VICTIM.location)
 GROUP BY efectividad_en_victima, fecha_inicio_tratamiento,
 fecha_fin_tratamiento, TREATMENT.treatment_id, VICTIM.victim_id; 
 
@@ -102,8 +104,8 @@ INSERT INTO ASSOCIATED_VICTIM(datetime_associated, victim_id, associated_id)
 SELECT fecha_conocio,  VICTIM.victim_id, ASSOCIATED.associated_id
 FROM TEMPORAL
 INNER JOIN ASSOCIATED ON (TEMPORAL.nombre_asociado = ASSOCIATED.associated_name AND TEMPORAL.apellido_asociado = ASSOCIATED.surname)
-INNER JOIN VICTIM ON (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname)
-GROUP BY fecha_conocio, ASSOCIATED.associated_id, VICTIM.victim_id;
+INNER JOIN VICTIM ON (TEMPORAL.nombre_victima = VICTIM.victim_name AND TEMPORAL.apellido_victima = VICTIM.surname AND TEMPORAL.direccion_victima = VICTIM.location)
+GROUP BY VICTIM.victim_name, VICTIM.surname, VICTIM.location, fecha_conocio, ASSOCIATED.associated_id, VICTIM.victim_id;
 
 
 /* ASSOCIATED_DETAIL */
@@ -112,7 +114,7 @@ SELECT fecha_inicio_contacto, fecha_fin_contacto,
 (SELECT assvictim_id FROM ASSOCIATED_VICTIM
 INNER JOIN VICTIM ON ASSOCIATED_VICTIM.victim_id = VICTIM.victim_id
 INNER JOIN ASSOCIATED ON ASSOCIATED_VICTIM.associated_id = ASSOCIATED.associated_id
-WHERE VICTIM.victim_name = nombre_victima AND VICTIM.surname = TEMPORAL.apellido_victima AND
+WHERE VICTIM.victim_name = TEMPORAL.nombre_victima AND VICTIM.surname = TEMPORAL.apellido_victima AND
 ASSOCIATED.associated_name = nombre_asociado AND ASSOCIATED.surname = TEMPORAL.apellido_asociado AND 
 ASSOCIATED_VICTIM.datetime_associated = TEMPORAL.fecha_conocio) AS Victima_Allegado,
 TYPE_CONTACT.type_id

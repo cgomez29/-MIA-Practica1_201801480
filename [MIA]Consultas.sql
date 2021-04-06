@@ -2,15 +2,27 @@ USE GrandVirusEpicenter;
 
 
 /* CONSULTA #01 */
+/**
+* Mostrar el nombre del hospital, su dirección y el número de fallecidos por
+* cada hospital registrado.
+*/
+
+CREATE VIEW view_consulta1 
+AS
 SELECT HOSPITAL.hospital_name, HOSPITAL.location, COUNT(VICTIM.death_date) AS Numero_de_fallecidos
 FROM VICTIM_STUDIED
 INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
 INNER JOIN VICTIM ON VICTIM_STUDIED.victim_id = VICTIM.victim_id
 GROUP BY HOSPITAL.hospital_name, HOSPITAL.location
-ORDER BY HOSPITAL.hospital_name;
-
+ORDER BY HOSPITAL.hospital_name
+;
 
 /* CONSULTA #02 */
+/**
+* Mostrar el nombre, apellido de todas las víctimas en cuarentena que
+* presentaron una efectividad mayor a 5 en el tratamiento “Transfusiones de
+* sangre”.
+*/
 SELECT VICTIM.victim_name, VICTIM.surname 
 FROM VICTIM_TREATMENT
 INNER JOIN VICTIM ON VICTIM_TREATMENT.victim_id = VICTIM.victim_id
@@ -20,6 +32,10 @@ WHERE VICTIM_TREATMENT.effect > 5 AND TREATMENT.tname = 'Transfusiones de sangre
 STATE.state_name = 'En cuarentena';
 
 /* CONSULTA #03 */
+/**
+* Mostrar el nombre, apellido y dirección de las víctimas fallecidas con más de
+* tres personas asociadas.	
+*/
 SELECT VICTIM.victim_name, VICTIM.surname, VICTIM.location, COUNT(associated_id) AS Allegados
 FROM ASSOCIATED_VICTIM 
 INNER JOIN VICTIM ON ASSOCIATED_VICTIM.victim_id = VICTIM.victim_id 
@@ -28,6 +44,10 @@ GROUP BY VICTIM.victim_name, VICTIM.surname, VICTIM.location
 HAVING COUNT(associated_id) > 3; 
 
 /* CONSULTA #04 */
+/**
+* Mostrar el nombre y apellido de todas las víctimas en estado “Suspendida”
+* que tuvieron contacto físico de tipo “Beso” con más de 2 de sus asociados.
+*/
 
 SELECT VICTIM.victim_name, VICTIM.surname
 FROM ASSOCIATED_DETAIL
@@ -40,6 +60,10 @@ GROUP BY VICTIM.victim_name, VICTIM.surname
 HAVING COUNT(ASSOCIATED_VICTIM.associated_id) > 2;
 
 /* CONSULTA #05 ***************************************/ 
+/**
+* Top 5 de víctimas que más tratamientos se han aplicado del tratamiento
+* “Oxígeno”.
+*/
 SELECT VICTIM.victim_name, VICTIM.surname, COUNT(TREATMENT.tname) AS record
 FROM VICTIM_TREATMENT
 INNER JOIN VICTIM ON VICTIM_TREATMENT.victim_id = VICTIM.victim_id
@@ -50,7 +74,11 @@ ORDER BY record DESC
 LIMIT 5;
 
 /* CONSULTA #06 */
-
+/**
+* Mostrar el nombre, el apellido y la fecha de fallecimiento de todas las
+* víctimas que se movieron por la dirección “1987 Delphine Well” a los cuales
+* se les aplicó "Manejo de la presión arterial" como tratamiento.
+*/
 SELECT VICTIM.victim_name, VICTIM.surname, VICTIM.death_date
 FROM VICTIM_TREATMENT
 INNER JOIN VICTIM ON VICTIM_TREATMENT.victim_id = VICTIM.victim_id
@@ -71,6 +99,11 @@ INNER JOIN VICTIM ON VICTIM_LOCATION.victim_id = VICTIM.victim_id
 WHERE VICTIM_LOCATION.location = '1987 Delphine Well';*/
 
 /* CONSULTA #07 */
+/**
+* Mostrar nombre, apellido y dirección de las víctimas que tienen menos de 2
+* allegados los cuales hayan estado en un hospital y que se le hayan aplicado
+* únicamente dos tratamientos.
+*/
 SELECT VICTIM.victim_name, VICTIM.surname, VICTIM.location
 FROM ASSOCIATED_VICTIM 
 INNER JOIN VICTIM ON ASSOCIATED_VICTIM.victim_id = VICTIM.victim_id 
@@ -90,8 +123,12 @@ GROUP BY victim_id;
 */
 
 /* CONSULTA #08 */
-
-SELECT VICTIM.sospecha_date, VICTIM.victim_name, VICTIM.surname, COUNT(VICTIM_TREATMENT.treatment_id) AS record
+/**
+* Mostrar el número de mes ,de la fecha de la primera sospecha, nombre y
+* apellido de las víctimas que más tratamientos se han aplicado y las que
+* menos. (Todo en una sola consulta).
+*/
+SELECT MONTH(VICTIM.sospecha_date) AS MES, VICTIM.victim_name, VICTIM.surname, COUNT(VICTIM_TREATMENT.treatment_id) AS record
 FROM VICTIM_TREATMENT
 INNER JOIN VICTIM ON VICTIM_TREATMENT.victim_id = VICTIM.victim_id
 INNER JOIN TREATMENT ON VICTIM_TREATMENT.treatment_id = TREATMENT.treatment_id
@@ -127,13 +164,20 @@ GROUP BY VICTIM.sospecha_date, VICTIM.victim_name, VICTIM.surname
 ) AS COUNTS;*/
 
 /* CONSULTA #09 */
-
+/**
+* Mostrar el porcentaje de víctimas que le corresponden a cada hospital.
+*/
 SELECT HOSPITAL.hospital_name, COUNT(victim_id) as Cantidad, CONCAT((COUNT(victim_id) /(SELECT COUNT(victim_id) FROM VICTIM_STUDIED)*100),'%') AS Porcentaje
 FROM VICTIM_STUDIED
 INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
 GROUP BY HOSPITAL.hospital_name;
 
 /* CONSULTA #10 */
+/**
+* Mostrar el porcentaje del contacto físico más común de cada hospital de la
+* siguiente manera: nombre de hospital, nombre del contacto físico, porcentaje
+* de víctimas.
+*/
 SELECT HOSPITAL.hospital_name, TYPE_CONTACT.type_name,  COUNT(TYPE_CONTACT.type_name)
 FROM VICTIM_STUDIED
 INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
@@ -171,15 +215,20 @@ INNER JOIN ASSOCIATED_DETAIL ON  ASSOCIATED_VICTIM.assvictim_id = ASSOCIATED_DET
 INNER JOIN TYPE_CONTACT ON ASSOCIATED_DETAIL.type_id = TYPE_CONTACT.type_id
 GROUP BY HOSPITAL.hospital_name, TYPE_CONTACT.type_name;
 
-
-
-
+SHOW FULL TABLES FROM GrandVirusEpicenter;
 
 SELECT * FROM VICTIM_TREATMENT ;
 SELECT * FROM TREATMENT ;
 SELECT * FROM VICTIM;
 SELECT * FROM STATE;
 SELECT * FROM TYPE_CONTACT;
+SELECT * FROM HOSPITAL; 
+SELECT * FROM ASSOCIATED;
+
+SELECT * FROM TEMPORAL;
+
+TRUNCATE TABLE TEMPORAL;
+
 
 -- 6
 

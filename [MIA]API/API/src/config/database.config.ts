@@ -1,11 +1,13 @@
-import { createPool, Pool } from 'mysql2/promise'
+import mysql from 'promise-mysql'
+import config from './config'
 
-export async function connect(): Promise<Pool> {
-    const connection = await createPool({
-        host: 'localhost',
-        user: 'root',
-        database: 'GrandVirusEpicenter',
-        password: '123c'
+const pool = mysql.createPool(config.DB);
+
+    pool.getConnection().then(connection => {
+        pool.releaseConnection(connection);
+        console.log('DB is connect');
     });
-    return connection;
-}
+
+export default pool;
+
+
