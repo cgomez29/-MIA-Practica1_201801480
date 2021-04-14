@@ -22,7 +22,7 @@ class IndexController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const posts = yield database_config_1.default.query(`SELECT * FROM view_consulta1;`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -39,7 +39,7 @@ class IndexController {
                                             INNER JOIN STATE ON VICTIM.state_id = STATE.state_id
                                             WHERE VICTIM_TREATMENT.effect > 5 AND TREATMENT.tname = 'Transfusiones de sangre'AND
                                             STATE.state_name = 'En cuarentena';`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -55,7 +55,7 @@ class IndexController {
                                             WHERE VICTIM.death_date IS NOT NULL
                                             GROUP BY VICTIM.victim_name, VICTIM.surname, VICTIM.location
                                             HAVING COUNT(associated_id) > 3; `);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -74,7 +74,7 @@ class IndexController {
                                             WHERE TYPE_CONTACT.type_name = 'Beso' AND STATE.state_name = 'Sospecha' 
                                             GROUP BY VICTIM.victim_name, VICTIM.surname
                                             HAVING COUNT(ASSOCIATED_VICTIM.associated_id) > 2;`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -92,7 +92,7 @@ class IndexController {
                                             GROUP BY VICTIM.victim_name, VICTIM.surname
                                             ORDER BY record DESC
                                             LIMIT 5;`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -108,7 +108,7 @@ class IndexController {
                                             INNER JOIN TREATMENT ON VICTIM_TREATMENT.treatment_id = TREATMENT.treatment_id
                                             WHERE VICTIM.victim_id IN (SELECT victim_id FROM VICTIM_LOCATION WHERE location = '1987 Delphine Well') 
                                             AND TREATMENT.tname = 'Manejo de la presion arterial';`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -128,7 +128,7 @@ class IndexController {
                                             GROUP BY victim_id) = 2
                                             GROUP BY VICTIM.victim_name, VICTIM.surname, VICTIM.location
                                             HAVING COUNT(associated_id) < 2; `);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -158,7 +158,7 @@ class IndexController {
                                             GROUP BY VICTIM.sospecha_date, VICTIM.victim_name, VICTIM.surname
                                             ) AS COUNTS) 
                                             ORDER BY record DESC;`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -172,7 +172,7 @@ class IndexController {
                                             FROM VICTIM_STUDIED
                                             INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
                                             GROUP BY HOSPITAL.hospital_name;`);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -182,8 +182,8 @@ class IndexController {
     consulta10(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const posts = yield database_config_1.default.query('');
-                return res.json(posts[0]);
+                const posts = yield database_config_1.default.query('SELECT * FROM view_consulta10;');
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -240,7 +240,7 @@ class IndexController {
                             fecha_inicio_tratamiento, fecha_fin_tratamiento, efectividad_en_victima);
                             `;
                 const posts = yield database_config_1.default.query(query);
-                return res.json(posts[0]);
+                return res.json(posts);
             }
             catch (e) {
                 console.log(e);
@@ -358,7 +358,7 @@ class IndexController {
                                             WHERE tratamiento != '' AND efectividad != '';`);
                 /* VICTIMA */
                 const posts5 = yield database_config_1.default.query(`INSERT INTO VICTIM(victim_name, surname, location, confirmacion_date, sospecha_date, death_date, state_id)
-                                            SELECT nombre_victima, apellido_victima, direccion_victima, fecha_primera_sospecha, fecha_confirmacion,
+                                            SELECT nombre_victima, apellido_victima, direccion_victima, fecha_confirmacion, fecha_primera_sospecha, 
                                             IF(fecha_muerte = '', NULL,STR_TO_DATE(fecha_muerte, '%Y-%m-%d %H:%i:%s')) AS muerte, STATE.state_id * 1 AS estado
                                             FROM TEMPORAL
                                             INNER JOIN STATE ON TEMPORAL.estado_victima = STATE.state_name
@@ -369,7 +369,8 @@ class IndexController {
                                             fecha_primera_sospecha,
                                             fecha_confirmacion,
                                             fecha_muerte, 
-                                            STATE.state_id;`);
+                                            STATE.state_id;
+                                            `);
                 /* UBICACION DE LA VICTIMA */
                 const posts6 = yield database_config_1.default.query(`INSERT INTO VICTIM_LOCATION(location, entrance_datetime, exit_datetime, victim_id)
                                             SELECT ubicacion_victima, fecha_llegada, fecha_retiro, VICTIM.victim_id  

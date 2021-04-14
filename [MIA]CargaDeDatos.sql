@@ -50,7 +50,7 @@ WHERE tratamiento != '' AND efectividad != '';
 
 /* VICTIMA */
 INSERT INTO VICTIM(victim_name, surname, location, confirmacion_date, sospecha_date, death_date, state_id)
-SELECT nombre_victima, apellido_victima, direccion_victima, fecha_primera_sospecha, fecha_confirmacion,
+SELECT nombre_victima, apellido_victima, direccion_victima, fecha_confirmacion, fecha_primera_sospecha, 
 IF(fecha_muerte = '', NULL,STR_TO_DATE(fecha_muerte, '%Y-%m-%d %H:%i:%s')) AS muerte, STATE.state_id * 1 AS estado
 FROM TEMPORAL
 INNER JOIN STATE ON TEMPORAL.estado_victima = STATE.state_name

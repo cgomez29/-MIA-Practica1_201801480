@@ -59,7 +59,7 @@ WHERE TYPE_CONTACT.type_name = 'Beso' AND STATE.state_name = 'Sospecha'
 GROUP BY VICTIM.victim_name, VICTIM.surname
 HAVING COUNT(ASSOCIATED_VICTIM.associated_id) > 2;
 
-/* CONSULTA #05 ***************************************/ 
+/* CONSULTA #05 */ 
 /**
 * Top 5 de víctimas que más tratamientos se han aplicado del tratamiento
 * “Oxígeno”.
@@ -178,18 +178,26 @@ GROUP BY HOSPITAL.hospital_name;
 * siguiente manera: nombre de hospital, nombre del contacto físico, porcentaje
 * de víctimas.
 */
-SELECT HOSPITAL.hospital_name, TYPE_CONTACT.type_name,  COUNT(TYPE_CONTACT.type_name)
-FROM VICTIM_STUDIED
-INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
-INNER JOIN VICTIM ON VICTIM_STUDIED.victim_id = VICTIM.victim_id
-INNER JOIN ASSOCIATED_VICTIM ON VICTIM.victim_id = ASSOCIATED_VICTIM.victim_id
-INNER JOIN ASSOCIATED_DETAIL ON  ASSOCIATED_VICTIM.assvictim_id = ASSOCIATED_DETAIL.assvictim_id
-INNER JOIN TYPE_CONTACT ON ASSOCIATED_DETAIL.type_id = TYPE_CONTACT.type_id
-GROUP BY HOSPITAL.hospital_name, TYPE_CONTACT.type_name;
 
-/****/
-SELECT Nombre, MAX(Record) FROM
-(SELECT HOSPITAL.hospital_name AS Nombre, TYPE_CONTACT.type_name AS Tipo,  COUNT(TYPE_CONTACT.type_name) AS Record
+-- SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+CREATE VIEW view_consulta10
+AS 
+SELECT Nombre, Tipo, MAX(Record), Porcentaje FROM 
+(SELECT HOSPITAL.hospital_name AS Nombre, TYPE_CONTACT.type_name AS Tipo,  COUNT(TYPE_CONTACT.type_name) AS Record,
+CONCAT((COUNT(TYPE_CONTACT.type_name)/
+	(SELECT  SUM(Total) AS TotalH FROM
+	(SELECT HOSPITAL.hospital_name AS Hospit, TYPE_CONTACT.type_name,  COUNT(TYPE_CONTACT.type_name) AS Total
+	FROM VICTIM_STUDIED
+	INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
+	INNER JOIN VICTIM ON VICTIM_STUDIED.victim_id = VICTIM.victim_id
+	INNER JOIN ASSOCIATED_VICTIM ON VICTIM.victim_id = ASSOCIATED_VICTIM.victim_id
+	INNER JOIN ASSOCIATED_DETAIL ON  ASSOCIATED_VICTIM.assvictim_id = ASSOCIATED_DETAIL.assvictim_id
+	INNER JOIN TYPE_CONTACT ON ASSOCIATED_DETAIL.type_id = TYPE_CONTACT.type_id
+	GROUP BY HOSPITAL.hospital_name, TYPE_CONTACT.type_name) as grupo
+	WHERE Hospit = HOSPITAL.hospital_name
+	GROUP BY Hospit) * 100
+
+),'%')  AS Porcentaje
 FROM VICTIM_STUDIED
 INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
 INNER JOIN VICTIM ON VICTIM_STUDIED.victim_id = VICTIM.victim_id
@@ -197,23 +205,14 @@ INNER JOIN ASSOCIATED_VICTIM ON VICTIM.victim_id = ASSOCIATED_VICTIM.victim_id
 INNER JOIN ASSOCIATED_DETAIL ON  ASSOCIATED_VICTIM.assvictim_id = ASSOCIATED_DETAIL.assvictim_id
 INNER JOIN TYPE_CONTACT ON ASSOCIATED_DETAIL.type_id = TYPE_CONTACT.type_id
 GROUP BY HOSPITAL.hospital_name, TYPE_CONTACT.type_name)
-AS Total
-WHERE Nombre = 'Animas General Hospital'
-GROUP BY Nombre;
+AS Resultado
+GROUP BY Nombre
+;
 
 
+SELECT * FROM view_consulta10;
 
-
-
-
-SELECT HOSPITAL.hospital_name, TYPE_CONTACT.type_name, SUM(COUNT(TYPE_CONTACT.type_name))
-FROM VICTIM_STUDIED
-INNER JOIN HOSPITAL ON VICTIM_STUDIED.hospital_id = HOSPITAL.hospital_id
-INNER JOIN VICTIM ON VICTIM_STUDIED.victim_id = VICTIM.victim_id
-INNER JOIN ASSOCIATED_VICTIM ON VICTIM.victim_id = ASSOCIATED_VICTIM.victim_id
-INNER JOIN ASSOCIATED_DETAIL ON  ASSOCIATED_VICTIM.assvictim_id = ASSOCIATED_DETAIL.assvictim_id
-INNER JOIN TYPE_CONTACT ON ASSOCIATED_DETAIL.type_id = TYPE_CONTACT.type_id
-GROUP BY HOSPITAL.hospital_name, TYPE_CONTACT.type_name;
+ SET global sql_mode='';
 
 SHOW FULL TABLES FROM GrandVirusEpicenter;
 
